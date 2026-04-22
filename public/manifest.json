@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Chessiro",
-  "description": "Chessiro",
+  "name": "Chess Analysis",
+  "description": "Analyse chess positions",
   "version": "1.0",
   "action": {
     "default_popup": "index.html"
@@ -31,5 +31,8 @@
     "16": "icon.png",
     "48": "icon.png",
     "128": "icon.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   }
 }

@@ -122,3 +122,310 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ─── FEN Display Card ─────────────────────────────────────────────────────── */
+.fen-card {
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--card-foreground);
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Loading state */
+.fen-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+.fen-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: fen-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes fen-spin {
+  to { transform: rotate(360deg); }
+}
+.fen-loading-text { font-size: 13px; }
+
+/* Empty state */
+.fen-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 14px;
+  text-align: center;
+}
+.fen-empty-icon { font-size: 28px; line-height: 1; margin-bottom: 4px; }
+.fen-empty-title { font-size: 13px; font-weight: 600; margin: 0; }
+.fen-empty-sub { font-size: 12px; color: var(--muted-foreground); margin: 0; }
+
+/* Active state */
+.fen-active { display: flex; flex-direction: column; gap: 8px; }
+
+.fen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fen-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #16a34a;
+  background: #dcfce7;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.dark .fen-badge {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.12);
+}
+
+.fen-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: fen-pulse 1.5s ease-in-out infinite;
+}
+@keyframes fen-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.fen-time {
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.fen-string-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--muted);
+  border-radius: 7px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.fen-string-wrap:hover { background: var(--accent); }
+
+.fen-string {
+  flex: 1;
+  font-family: 'Menlo', 'Consolas', monospace;
+  font-size: 11px;
+  color: var(--foreground);
+  word-break: break-all;
+  line-height: 1.5;
+  user-select: all;
+}
+
+.fen-copy-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
+  margin-top: 1px;
+}
+.fen-copy-btn:hover { color: var(--foreground); background: var(--border); }
+.fen-copy-btn--done { color: #16a34a !important; }
+.dark .fen-copy-btn--done { color: #4ade80 !important; }
+
+.fen-gameid {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+
+/* ─── Best Move Card ───────────────────────────────────────────────────────── */
+.bm-card {
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--card-foreground);
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Loading */
+.bm-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+.bm-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: fen-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+.bm-loading-text { font-size: 13px; }
+
+/* Error */
+.bm-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--destructive-foreground);
+}
+.bm-error-icon { font-size: 16px; }
+.bm-error-text { font-size: 12px; }
+
+/* Active wrapper */
+.bm-active { display: flex; flex-direction: column; gap: 10px; }
+
+.bm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bm-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7c3aed;
+  background: #ede9fe;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.dark .bm-label {
+  color: #a78bfa;
+  background: rgba(167, 139, 250, 0.12);
+}
+
+.bm-icon { flex-shrink: 0; }
+
+.bm-depth {
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+/* ── Lines list ── */
+.bm-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Single engine line ── */
+.bm-line {
+  display: grid;
+  grid-template-columns: 36px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 7px 10px;
+  background: var(--muted);
+  transition: background 0.15s;
+}
+.bm-line:hover { background: var(--accent); }
+
+/* Primary (1st) line — slightly more prominent */
+.bm-line--primary {
+  background: #ede9fe;
+  border: 1px solid #c4b5fd;
+}
+.dark .bm-line--primary {
+  background: rgba(167, 139, 250, 0.1);
+  border-color: rgba(167, 139, 250, 0.25);
+}
+.bm-line--primary:hover {
+  background: #ddd6fe;
+}
+.dark .bm-line--primary:hover {
+  background: rgba(167, 139, 250, 0.18);
+}
+
+/* Rank badge */
+.bm-rank {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-radius: 5px;
+  padding: 2px 5px;
+  text-align: center;
+  white-space: nowrap;
+}
+.bm-rank--1 { color: #7c3aed; background: #c4b5fd; }
+.bm-rank--2 { color: #0369a1; background: #bae6fd; }
+.bm-rank--3 { color: #92400e; background: #fde68a; }
+.dark .bm-rank--1 { color: #c4b5fd; background: rgba(196,181,253,0.18); }
+.dark .bm-rank--2 { color: #7dd3fc; background: rgba(125,211,252,0.15); }
+.dark .bm-rank--3 { color: #fde68a; background: rgba(253,230,138,0.15); }
+
+/* SAN move */
+.bm-line-move {
+  font-family: 'Menlo', 'Consolas', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--foreground);
+}
+.bm-line--primary .bm-line-move { font-size: 15px; }
+
+/* Eval bar */
+.bm-bar {
+  width: 56px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.bm-bar__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7c3aed, #a78bfa);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+/* Score chip */
+.bm-score {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border-radius: 5px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+.bm-score--win   { color: #15803d; background: #dcfce7; }
+.bm-score--loss  { color: #b91c1c; background: #fee2e2; }
+.bm-score--equal { color: var(--muted-foreground); background: var(--border); }
+.dark .bm-score--win  { color: #4ade80; background: rgba(74,222,128,0.12); }
+.dark .bm-score--loss { color: #f87171; background: rgba(248,113,113,0.12); }

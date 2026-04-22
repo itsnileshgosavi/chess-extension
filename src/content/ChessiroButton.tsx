@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Draggable from "react-draggable";
+import { Chess } from "chess.js";
 
 function getChessiroUrl(): string | null {
   const url = window.location.href;
@@ -17,6 +18,88 @@ function getChessiroUrl(): string | null {
   return null;
 }
 
+// ─── FEN extraction via move list ──────────────────────────────────────────────
+//
+// Confirmed chess.com DOM structure (live & archive games):
+//
+//   <div class="main-line-row move-list-row ..." data-whole-move-number="1">
+//     <div class="node white-move main-line-ply" ...>
+//       <span class="node-highlight-content ...">e4 </span>
+//     </div>
+//     <div class="node black-move main-line-ply" ...>
+//       <span class="node-highlight-content ...">c5 </span>
+//     </div>
+//   </div>
+
+/**
+ * Read every SAN move from the move list and replay them with chess.js
+ * to produce an accurate FEN (including side-to-move, castling, en-passant).
+ */
+function computeFenFromMoveList(): string {
+  // Each half-move (ply) is a .node.main-line-ply element.
+  // The SAN text is inside the .node-highlight-content child span.
+  const plies = document.querySelectorAll(
+    ".main-line-row .node.main-line-ply",
+  );
+
+  if (plies.length === 0) return "";
+
+  const chess = new Chess();
+
+  for (const ply of plies) {
+    const sanEl = ply.querySelector(".node-highlight-content");
+    const san = sanEl?.textContent?.trim();
+    if (!san) continue;
+    try {
+      chess.move(san);
+    } catch {
+      // Unrecognized token (e.g. annotation icon text) — stop here
+      break;
+    }
+  }
+
+  return chess.fen();
+}
+
+/** Persist FEN + game metadata to chrome.storage.local */
+function saveFen() {
+  const fen = computeFenFromMoveList();
+  if (!fen) return;
+
+  const url = window.location.href;
+  const liveMatch = url.match(/chess\.com\/game\/live\/(\d+)/);
+  const gameMatch = url.match(/chess\.com\/game\/(?!live\/)(\d+)/);
+  const gameId = (liveMatch ?? gameMatch)?.[1] ?? null;
+
+  chrome.storage.local.set({
+    chessiroFen: { fen, gameId, timestamp: Date.now() },
+  });
+}
+
+// Debounce to avoid spamming storage on rapid DOM mutations
+let fenSaveTimer: ReturnType<typeof setTimeout> | null = null;
+function debouncedSaveFen() {
+  if (fenSaveTimer) clearTimeout(fenSaveTimer);
+  fenSaveTimer = setTimeout(saveFen, 120);
+}
+
+/** Start observing the move list for DOM mutations */
+function startFenObserver(): MutationObserver {
+  saveFen(); // capture immediately on mount
+
+  const observer = new MutationObserver(debouncedSaveFen);
+
+  // The move list lives in the regular (light) DOM — no shadow piercing needed.
+  // Watch the whole body so we catch the move list being injected after load.
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    characterData: true, // catches text node updates inside move spans
+  });
+
+  return observer;
+}
+
 export default function ChessiroButton() {
   // Only track whether we're on a game page (for show/hide).
   // The actual URL is always read fresh at click time — never stale.
@@ -25,6 +108,7 @@ export default function ChessiroButton() {
   );
   const [isHovered, setIsHovered] = useState(false);
   const nodeRef = useRef<HTMLDivElement>(null);
+  const fenObserverRef = useRef<MutationObserver | null>(null);
   // Use refs for drag tracking — avoids render-timing races
   const hasDragged = useRef(false);
   const dragStart = useRef<{ x: number; y: number } | null>(null);
@@ -50,11 +134,15 @@ export default function ChessiroButton() {
     //    that doesn't go through the patched history methods
     const poll = setInterval(check, 500);
 
+    // 3. Start the FEN observer
+    fenObserverRef.current = startFenObserver();
+
     return () => {
       window.removeEventListener("popstate", check);
       history.pushState = origPush;
       history.replaceState = origReplace;
       clearInterval(poll);
+      fenObserverRef.current?.disconnect();
     };
   }, []);
 
